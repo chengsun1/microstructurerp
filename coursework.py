@@ -2,6 +2,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.font_manager import FontProperties
 def load_data():
     data = pd.read_csv('LDN_60s.csv')
     data['dateFormatted'] = pd.to_datetime(data['DateTime'].str[:26],
@@ -39,15 +40,26 @@ data = add_columns(data)
 data = data.mask(data.spread <= 0)
 #%%
 # 1.1 Plot the mid-price time series for each stock
-uniqueStock = data['Stock'].unique()
-for stock in uniqueStock:
+stocks = data['Stock'].unique()
+columns_to_plot = ['depth','spread']
+colors = ['blue','red']
+
+font = FontProperties()
+font.set_family('sans-serif')
+
+for stock in stocks:
     subset = data[data['Stock'] == stock]
-    plt.figure()
-    plt.plot(subset['dateFormatted'], subset['mid'])
-    plt.title(str(stock) + ' Mids')
-    plt.xlabel('Time')
-    plt.ylabel('Mid Price')
-    plt.savefig(f'{str(stock)}_mid.png')
+    fig, axs = plt.subplots(nrows=2, figsize=(10, 5), dpi=500)
+
+    for ax, col, color in zip(axs, columns_to_plot,colors):
+        ax.plot(subset['dateFormatted'], subset[col], color=color)
+        ax.set_title(f'{str(stock) + " " + col.capitalize()}', fontproperties = font)
+        ax.set_xlabel('Time', fontproperties = font)
+        ax.set_ylabel(col, fontproperties = font)
+
+    plt.tight_layout()
+    plt.savefig(f'{str(stock) + "time_series.png"}',dpi=500)
     plt.close()
 
+# 1.2 summary statistics
 
