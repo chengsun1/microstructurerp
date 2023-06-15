@@ -38,8 +38,8 @@ data = filter_data(data)
 data = select_stocks(data,num_stocks)
 data = add_columns(data)
 data = data.mask(data.spread <= 0)
-#%%
-# 1.1 Plot the mid-price time series for each stock
+#%% 1.1
+# 1.1.1 Plot the mid-price time series for each stock
 stocks = data['Stock'].unique()
 columns_to_plot = ['depth','spread']
 colors = ['blue','red']
@@ -61,7 +61,40 @@ for stock in stocks:
     plt.savefig(f'{foutput_path}/{str(stock) + "time_series.png"}',dpi=500)
     plt.close()
 
-# 1.2 summary statistics
+# 1.1.2 summary statistics
 doutput_path = '/Users/chengsun/Documents/GitHub/microstructurerp/Outputs/Data'
 summary = data.groupby('Stock')[['depth','spread']].describe()
 summary.to_csv(f'{doutput_path}/summary.csv')
+
+#%% 1.2
+# 1.2.1
+data['Hour'] = data.dateFormatted.dt.hour
+columns_depth_spread = ['depth','spread']
+hourly_means = {}
+for column in columns_depth_spread:
+    hourly_means[column] = data.groupby(['Stock','Hour'])[column].mean().reset_index()
+#1.2.2
+for stock in stocks:
+    fig, ax1 = plt.subplots(figsize=(10,5), dpi=500)
+
+    depth_df = hourly_means['depth'][hourly_means['depth']['Stock'] == stock]
+    spread_df = hourly_means['spread'][hourly_means['spread']['Stock'] == stock]
+
+    color = 'tab:blue'
+    ax1.set_xlabel('Hour')
+    ax1.set_ylabel('Hourly Mean Depth', color=color)
+    ax1.plot(depth_df['Hour'], depth_df['depth'], color=color)
+    ax1.tick_params(axis='y', labelcolor=color)
+
+    ax2 = ax1.twinx()
+    color = 'tab:red'
+    ax2.set_ylabel('Hourly Mean Spread', color=color)
+    ax2.plot(spread_df['Hour'], spread_df['spread'], color=color)
+    ax2.tick_params(axis='y', labelcolor=color)
+
+    plt.title(f'Hourly Mean Depth and Spread for {stock}')
+    plt.savefig(f'{foutput_path}/{str(stock) + "hourly_mean_spread.png"}',dpi=500)
+
+#%% 1.3
+
+
