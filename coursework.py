@@ -43,7 +43,7 @@ data = data.mask(data.spread <= 0)
 stocks = data['Stock'].unique()
 columns_to_plot = ['depth','spread']
 colors = ['blue','red']
-output_path = '/Users/chengsun/Documents/GitHub/microstructurerp/Outputs/Graph'
+foutput_path = '/Users/chengsun/Documents/GitHub/microstructurerp/Outputs/Graph'
 font = FontProperties()
 font.set_family('sans-serif')
 
@@ -58,8 +58,10 @@ for stock in stocks:
         ax.set_ylabel(col, fontproperties = font)
 
     plt.tight_layout()
-    plt.savefig(f'{output_path}/{str(stock) + "time_series.png"}',dpi=500)
+    plt.savefig(f'{foutput_path}/{str(stock) + "time_series.png"}',dpi=500)
     plt.close()
 
 # 1.2 summary statistics
-
+doutput_path = '/Users/chengsun/Documents/GitHub/microstructurerp/Outputs/Data'
+summary = data.groupby('Stock')[['depth','spread']].describe()
+summary.to_csv(f'{doutput_path}/summary.csv')
