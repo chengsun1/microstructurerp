@@ -1,4 +1,5 @@
 #%% data preprocessing
+import pandas
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -96,5 +97,9 @@ for stock in stocks:
     plt.savefig(f'{foutput_path}/{str(stock) + "hourly_mean_spread.png"}',dpi=500)
 
 #%% 1.3
+data['Date']=data.dateFormatted.dt.date
+#%% 2.1
+data2 = pandas.read_excel('smm_pf_data_2023.xlsx')
+
 
 
