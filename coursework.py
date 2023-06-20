@@ -98,9 +98,49 @@ for stock in stocks:
 
 #%% 1.3
 data['Date']=data.dateFormatted.dt.date
+daily_mean = data.groupby(['Stock','Date'])[['depth','spread']].mean().reset_index()
+data['mid_return'] = data.groupby('Stock')['mid'].pct_change()
+data['abs_mid_return'] = data['mid_return'].abs()
+daily_volatility = data.groupby(['Stock','Date'])['abs_mid_return'].mean().reset_index()
+daily_stats = pd.merge(daily_mean,daily_volatility,on=['Stock','Date'])
+for stock in stocks:
+    fig, ax1 = plt.subplots(figsize=(10,5), dpi=500)
+    stock_data = daily_stats[daily_stats['Stock'] == stock]
+    color = 'tab:blue'
+    ax1.set_xlabel('Date')
+    ax1.set_ylabel('Daily Mean Depth', color=color)
+    ax1.plot(stock_data['Date'], stock_data['depth'], color=color)
+    ax1.tick_params(axis='y', labelcolor=color)
+
+    ax2 = ax1.twinx()
+    color = 'tab:red'
+    ax2.set_ylabel('Daily Mean Spread', color=color)
+    ax2.plot(stock_data['Date'], stock_data['spread'], color=color)
+    ax2.tick_params(axis='y', labelcolor=color)
+
+    ax3 = ax1.twinx()
+    color = 'tab:green'
+    ax3.set_ylabel('Daily Midquote Volatility', color=color)
+    ax3.plot(stock_data['Date'], stock_data['abs_mid_return'], color=color)
+    ax3.tick_params(axis='y', labelcolor=color)
+    plt.title(f'Daily Mean Depth, Spread and Midquote Volatility for {stock}')
+    plt.tight_layout()
+    plt.savefig(f'{foutput_path}/{str(stock) + "daily_mean_spread_volatility.png"}',dpi=500)
+#%% 1.3.2
+correlation_table = pd.DataFrame(columns=['Stock','Correlation'])
+for stock in stocks:
+    stock_data = daily_stats[daily_stats['Stock'] == stock]
+    correlation = stock_data['spread'].corr(stock_data['depth'])
+    newrow = pd.DataFrame({'Stock':stock,'Correlation':correlation},index=[0])
+    correlation_table = pd.concat([correlation_table,newrow],ignore_index=True)
+    correlation_table.to_csv(f'{doutput_path}/correlation.csv')
+#%% 1.3.3 linear regression
+
+
 #%% 2.1
 data2 = pandas.read_excel('smm921_pf_data_2023.xlsx').set_index('Date', inplace=True)
-data
+print(stock_data)
+
 
 
 
