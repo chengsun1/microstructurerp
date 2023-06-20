@@ -99,7 +99,9 @@ for stock in stocks:
 #%% 1.3
 data['Date']=data.dateFormatted.dt.date
 #%% 2.1
-data2 = pandas.read_excel('smm_pf_data_2023.xlsx')
+data2 = pandas.read_excel('smm921_pf_data_2023.xlsx').set_index('Date', inplace=True)
+data
+
 
 
 
