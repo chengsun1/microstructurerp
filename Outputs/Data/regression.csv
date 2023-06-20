@@ -1,0 +1,7 @@
+,Stock,Dependent,Intercept,Slope,p-value,R-squared
+0,GSK.L,spread,2.3905,2.2785e+03,0.0,0.2936
+1,GSK.L,depth,1044.3458,-1.5096e+05,0.3393,0.012
+2,RIO.L,spread,2.3341,2.2668e+03,0.0,0.3234
+3,RIO.L,depth,400.9192,-4.0573e+04,0.6752,0.0023
+4,WPP.L,spread,5.0821,1.7872e+03,0.183,0.0232
+5,WPP.L,depth,1768.9319,-1.1873e+06,0.021,0.0681

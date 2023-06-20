@@ -135,11 +135,31 @@ for stock in stocks:
     correlation_table = pd.concat([correlation_table,newrow],ignore_index=True)
     correlation_table.to_csv(f'{doutput_path}/correlation.csv')
 #%% 1.3.3 linear regression
+import statsmodels.api as sm
+daily_stats = daily_stats.dropna(subset=['Stock'])
+stocks = daily_stats['Stock'].unique()
+regression_results = pd.DataFrame(columns=['Stock', 'Dependent', 'Intercept', 'Slope', 'p-value','R-squared'])
+for stock in stocks:
+    stock_data = daily_stats[daily_stats['Stock'] == stock]
+
+    for dependent in ['spread', 'depth']:
+        X = stock_data['abs_mid_return']
+        y = stock_data[dependent]
+        X = sm.add_constant(X)
+        model = sm.OLS(y, X)
+        results = model.fit()
+        regression_results = pd.concat([regression_results,
+                                        pd.DataFrame({'Stock': [stock],
+                                                      'Dependent': [dependent],
+                                                      'Intercept': [round(results.params.const,4)],
+                                                      'Slope': ['{:.4e}'.format(results.params.abs_mid_return)],
+                                                      'p-value': [round(results.pvalues.abs_mid_return,4)],
+                                                      'R-squared': [round(results.rsquared,4)]})],
+                                       ignore_index=True)
+
+regression_results.to_csv(f'{doutput_path}/regression.csv')
 
 
-#%% 2.1
-data2 = pandas.read_excel('smm921_pf_data_2023.xlsx').set_index('Date', inplace=True)
-print(stock_data)
 
 
 
