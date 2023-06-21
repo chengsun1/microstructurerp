@@ -1,9 +1,9 @@
 #%% data preprocessing
-import pandas
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.font_manager import FontProperties
+import statsmodels.api as sm
 def load_data():
     data = pd.read_csv('LDN_60s.csv')
     data['dateFormatted'] = pd.to_datetime(data['DateTime'].str[:26],
@@ -50,13 +50,18 @@ font.set_family('sans-serif')
 
 for stock in stocks:
     subset = data[data['Stock'] == stock]
-    fig, axs = plt.subplots(nrows=2, figsize=(10, 5), dpi=500)
+    fig, ax1 = plt.subplots(figsize=(10, 5), dpi=500)
 
-    for ax, col, color in zip(axs, columns_to_plot,colors):
-        ax.plot(subset['dateFormatted'], subset[col], color=color)
-        ax.set_title(f'{str(stock) + " " + col.capitalize()}', fontproperties = font)
-        ax.set_xlabel('Time', fontproperties = font)
-        ax.set_ylabel(col, fontproperties = font)
+    ax1.plot(subset['dateFormatted'], subset[columns_to_plot[0]], color=colors[0])
+    ax1.set_title(f'{str(stock)+ " " + "Depth and Spread" }', fontproperties=font)
+    ax1.set_xlabel('Date', fontproperties=font)
+    ax1.set_ylabel(columns_to_plot[0], color=colors[0], fontproperties=font)
+    ax1.tick_params(axis='y', labelcolor=colors[0], labelsize=8)
+
+    ax2 = ax1.twinx()
+    ax2.plot(subset['dateFormatted'], subset[columns_to_plot[1]], color=colors[1])
+    ax2.set_ylabel(columns_to_plot[1], color=colors[1], fontproperties=font)
+    ax2.tick_params(axis='y', labelcolor=colors[1], labelsize=8)
 
     plt.tight_layout()
     plt.savefig(f'{foutput_path}/{str(stock) + "time_series.png"}',dpi=500)
@@ -135,7 +140,6 @@ for stock in stocks:
     correlation_table = pd.concat([correlation_table,newrow],ignore_index=True)
     correlation_table.to_csv(f'{doutput_path}/correlation.csv')
 #%% 1.3.3 linear regression
-import statsmodels.api as sm
 daily_stats = daily_stats.dropna(subset=['Stock'])
 stocks = daily_stats['Stock'].unique()
 regression_results = pd.DataFrame(columns=['Stock', 'Dependent', 'Intercept', 'Slope', 'p-value','R-squared'])
